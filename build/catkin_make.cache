@@ -1,0 +1,2 @@
+image_rec:vrep_ros_interface
+-DCATKIN_DEVEL_PREFIX=/home/xinjie/elec4010_ws/devel -DCMAKE_INSTALL_PREFIX=/home/xinjie/elec4010_ws/install -G Unix Makefiles

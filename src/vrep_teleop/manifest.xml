@@ -1,0 +1,18 @@
+<package>
+  <description brief="vrep_teleop">
+
+     vrep_teleop
+
+  </description>
+  <author>xinjie</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/vrep_teleop</url>
+  <depend package="rospy"/>
+  <depend package="geometry_msgs"/>
+  <depend package="std_msgs"/>
+  <depend package="roscpp"/>
+
+</package>
+
+
