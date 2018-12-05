@@ -1,0 +1,8 @@
+prefix=/home/xinjie/elec4010_ws/devel
+
+Name: hector_mapping
+Description: Description of hector_mapping
+Version: 0.3.5
+Cflags: -I/home/xinjie/elec4010_ws/devel/include -I/home/xinjie/elec4010_ws/src/hector_slam-catkin/hector_mapping/include -I/usr/include/eigen3
+Libs: -L/home/xinjie/elec4010_ws/devel/lib 
+Requires: roscpp nav_msgs visualization_msgs tf message_filters laser_geometry tf_conversions message_runtime
