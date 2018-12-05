@@ -33,7 +33,7 @@ class ball_tracker:
   def __init__(self):
     self.bridge = CvBridge()
     self.image_sub = rospy.Subscriber("/vrep/image",Image,self.callback)
-    self.state_sub = rospy.Subscriber("/track/bool",Bool,self.state)
+    self.state_sub = rospy.Subscriber("/tracker_switch/bool",Bool,self.state)
     self.Twist_pub = rospy.Publisher('/vrep/cmd_vel',Twist,queue_size=5)
 
   def state(self,data):
@@ -101,7 +101,7 @@ class ball_tracker:
         twist.linear.x = 0
         self.Twist_pub.publish(twist)
         switch_flag = False
-        
+
     if centroid_x != None and centroid_y != None and track_state.data == True:
 
 
@@ -142,4 +142,3 @@ def main(args):
 
 if __name__ == '__main__':
     main(sys.argv)
-

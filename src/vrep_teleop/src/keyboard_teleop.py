@@ -30,6 +30,7 @@
 import rospy
 
 from geometry_msgs.msg import Twist
+from std_msgs import Bool
 
 import sys, select, termios, tty
 
@@ -87,10 +88,15 @@ def vels(speed,turn):
 
 if __name__=="__main__":
     settings = termios.tcgetattr(sys.stdin)
-    
-    rospy.init_node('vrep_teleop')
-    pub = rospy.Publisher('vrep/cmd_vel', Twist, queue_size=5)
 
+    rospy.init_node('vrep_teleop')
+    vel_pub = rospy.Publisher('vrep/cmd_vel', Twist, queue_size=5)
+    cv_switch_pub = rospy.Publisher('/cv_switch/bool', Bool, queue_size=5)
+    tracker_switch_pub = rospy.Publisher('/tracker_switch/bool', Bool, queue_size=5)
+    cv_switch = Bool()
+    cv_switch.data = True
+    tracker_switch = Bool()
+    tracker_switch.data = False
     x = 0
     th = 0
     status = 0
@@ -123,6 +129,14 @@ if __name__=="__main__":
                 th = 0
                 control_speed = 0
                 control_turn = 0
+            elif key == 't':
+                tracker_switch.data = !tracker_switch.data
+                tracker_switch_pub.publish(tracker_switch)
+                print("Tracker state changed")
+            elif key == 'f':
+                cv_switch.data = !cv_switch.data
+                cv_switch_sub.publish(cv_switch)
+                print("Face recognition mode changed")
             else:
                 count = count + 1
                 if count > 4:
@@ -151,7 +165,8 @@ if __name__=="__main__":
             twist = Twist()
             twist.linear.x = control_speed; twist.linear.y = 0; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = control_turn
-            pub.publish(twist)
+            if tracker_switch.data == False:    
+                vel_pub.publish(twist)
 
             #print("loop: {0}".format(count))
             #print("target: vx: {0}, wz: {1}".format(target_speed, target_turn))
@@ -164,6 +179,7 @@ if __name__=="__main__":
         twist = Twist()
         twist.linear.x = 0; twist.linear.y = 0; twist.linear.z = 0
         twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
-        pub.publish(twist)
+        if tracker_switch.data == False:
+            vel_pub.publish(twist)
 
 termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)

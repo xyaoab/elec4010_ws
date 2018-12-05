@@ -7,7 +7,8 @@ import rospy
 import math
 import cv2
 from std_msgs.msg import String
-from sensor_msgs.msg import Image, LaserScan 
+from std_msgs.msg import Bool
+from sensor_msgs.msg import Image, LaserScan
 from cv_bridge import CvBridge, CvBridgeError
 from rvizMarker import RvizMarker
 from squares import find_squares,  get_side
@@ -15,13 +16,14 @@ from squares import find_squares,  get_side
 templates =['pic001.jpg', 'pic002.jpg', 'pic003.jpg', 'pic004.jpg', 'pic005.jpg']
 templates_path = './src/image_rec/picture/'
 
-face_names = { 
+face_names = {
   templates_path+templates[0] : "Obama",
   templates_path+templates[1] : "Arvil",
   templates_path+templates[2] : "GEGE",
   templates_path+templates[3] : "Legolas",
   templates_path+templates[4] : "levi"
 }
+cv_flag = True
 
 class image_converter:
 
@@ -30,9 +32,14 @@ class image_converter:
     self.laser_data = 0.
     self.image_pub = rospy.Publisher("/vrep/imagecov",Image,queue_size=1)
     self.bridge = CvBridge()
+    self.cv_switch_sub = rospy.Subscriber("/cv_switch/bool",Bool,self.cv_switch)
     self.image_sub = rospy.Subscriber("/vrep/image",Image,self.callback)
     self.laser_sub = rospy.Subscriber("/vrep/scan", LaserScan, self.laser_callback)
 
+
+  def cv_switch(self,switch_cv):
+      global cv_flag
+      cv_flag = switch_cv.data
 
   def laser_callback(self, scan_data):
     if(scan_data.ranges[self.laser_scan_index]):
@@ -40,29 +47,31 @@ class image_converter:
 
 
   def callback(self,data):
-    try:
-      cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
-      cv_image = cv2.flip(cv_image,1)
+      global cv_flag
+      if cv_flag == True:
 
-    except CvBridgeError as e:
-      print(e)
-    ##### detect face
-    ## init rviz marker node
-    self.marker = RvizMarker('base_link', '/rviz/marker')
-    self.marker.setDefaultMarkerParams()
+          try:
+              cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+              cv_image = cv2.flip(cv_image,1)
 
-    face = self.face_detect(cv_image)
+          except CvBridgeError as e:
+          print(e)
+          ##### detect face
+          ## init rviz marker node
+          self.marker = RvizMarker('base_link', '/rviz/marker')
+          self.marker.setDefaultMarkerParams()
 
+          face = self.face_detect(cv_image)
 
+          cv2.imshow("Image window", face)
+          cv2.waitKey(1)
 
-    cv2.imshow("Image window", face)
-    cv2.waitKey(1)
-
-    try:
-      self.image_pub.publish(self.bridge.cv2_to_imgmsg(face, "bgr8"))
-    except CvBridgeError as e:
-      print(e)
-
+          try:
+              self.image_pub.publish(self.bridge.cv2_to_imgmsg(face, "bgr8"))
+          except CvBridgeError as e:
+              print(e)
+      else:
+          print("Face recognition turned off !!")
   # human face
   def face_detect(self,img):
     self.good_match=[]
@@ -88,7 +97,7 @@ class image_converter:
 
       for i in range(4):
         self.template_matching(templates_path+templates[i], img, False, True)
-      cv2.putText(img, face_names[templates_path+templates[np.argmax(self.good_match)]], 
+      cv2.putText(img, face_names[templates_path+templates[np.argmax(self.good_match)]],
           (50, 150),cv2.FONT_HERSHEY_COMPLEX,1,(0,0,255),2)
       print(self.good_match)
 
@@ -158,7 +167,7 @@ class image_converter:
     y = -self.laser_data * math.cos(angle_diff)
     print("3d loc", x,y)
     pose = self.marker.getPose(x,y)
-    return pose 
+    return pose
 
 
 
