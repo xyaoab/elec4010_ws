@@ -2,6 +2,7 @@
 from __future__ import print_function
 import numpy as np
 import roslib
+import os
 import sys
 import rospy
 import math
@@ -14,7 +15,7 @@ from rvizMarker import RvizMarker
 from squares import find_squares,  get_side
 
 templates =['pic001.jpg', 'pic002.jpg', 'pic003.jpg', 'pic004.jpg', 'pic005.jpg']
-templates_path = './src/image_rec/picture/'
+templates_path = sys.path[0]+'/picture/'
 
 face_names = {
   templates_path+templates[0] : "Obama",
@@ -83,8 +84,8 @@ class image_converter:
     self.good_match=[]
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray = cv2.equalizeHist(gray)
-
-    faceCascade = cv2.CascadeClassifier('./src/image_rec/src/haarcascade_frontalface_default.xml')
+    faceCascade = cv2.CascadeClassifier(sys.path[0]+'/haarcascade_frontalface_default.xml')
+    #faceCascade = cv2.CascadeClassifier('/home/xinjie/elec4010_ws/src/image_rec/src/haarcascade_frontalface_default.xml')
     faces = faceCascade.detectMultiScale(gray,scaleFactor=1.12,
       minNeighbors=5,minSize=(30, 30))
     print ("Found {0} human faces!".format(len(faces)))
@@ -178,6 +179,7 @@ class image_converter:
 
 
 def main(args):
+  print(sys.path[0])
   ic = image_converter()
   rospy.init_node('image_converter', anonymous=True)
   try:
