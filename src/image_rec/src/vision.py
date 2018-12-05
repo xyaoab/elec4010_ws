@@ -4,11 +4,14 @@ import numpy as np
 import roslib
 import sys
 import rospy
+import math
 import cv2
 from std_msgs.msg import String
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, LaserScan 
 from cv_bridge import CvBridge, CvBridgeError
 from rvizMarker import RvizMarker
+from squares import find_squares,  get_side
+
 templates =['pic001.jpg', 'pic002.jpg', 'pic003.jpg', 'pic004.jpg', 'pic005.jpg']
 templates_path = './src/image_rec/picture/'
 
@@ -23,10 +26,18 @@ face_names = {
 class image_converter:
 
   def __init__(self):
+    self.laser_scan_index = 450
+    self.laser_data = 0.
     self.image_pub = rospy.Publisher("/vrep/imagecov",Image,queue_size=1)
-
     self.bridge = CvBridge()
     self.image_sub = rospy.Subscriber("/vrep/image",Image,self.callback)
+    self.laser_sub = rospy.Subscriber("/vrep/scan", LaserScan, self.laser_callback)
+
+
+  def laser_callback(self, scan_data):
+    if(scan_data.ranges[self.laser_scan_index]):
+      self.laser_data = scan_data.ranges[self.laser_scan_index]
+
 
   def callback(self,data):
     try:
@@ -37,10 +48,12 @@ class image_converter:
       print(e)
     ##### detect face
     ## init rviz marker node
-    self.marker = RvizMarker('camera_link', '/rviz/marker')
+    self.marker = RvizMarker('base_link', '/rviz/marker')
     self.marker.setDefaultMarkerParams()
 
     face = self.face_detect(cv_image)
+
+
 
     cv2.imshow("Image window", face)
     cv2.waitKey(1)
@@ -57,23 +70,27 @@ class image_converter:
     gray = cv2.equalizeHist(gray)
 
     faceCascade = cv2.CascadeClassifier('./src/image_rec/src/haarcascade_frontalface_default.xml')
-    faces = faceCascade.detectMultiScale(gray,scaleFactor=1.1,
-      minNeighbors=5,minSize=(20, 20))
+    faces = faceCascade.detectMultiScale(gray,scaleFactor=1.12,
+      minNeighbors=5,minSize=(30, 30))
     print ("Found {0} human faces!".format(len(faces)))
     #human face detected
     if len(faces) != 0:
       for (x,y,w,h) in faces:
-        cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+
+        squares = find_squares(img)
+        cv2.drawContours( img, squares, 0, (120,0,120), 3 )
+        cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),3)
 
         #publish pose in rviz
-        pose = self.marker.getPose(x, y, w, h)
+
+        pose = self.estimate_depth(x, y, w, h)
         self.marker.publishMarker(pose)
 
       for i in range(4):
         self.template_matching(templates_path+templates[i], img, False, True)
       cv2.putText(img, face_names[templates_path+templates[np.argmax(self.good_match)]], 
           (50, 150),cv2.FONT_HERSHEY_COMPLEX,1,(0,0,255),2)
-      #print(self.good_match)
+      print(self.good_match)
 
     # search for levi
     else:
@@ -113,17 +130,14 @@ class image_converter:
       # draw bounding box
 
       if draw:
-        M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
-        matchesMask = mask.ravel().tolist()
 
-        h,w,_ = template.shape
-        pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
-        dst = cv2.perspectiveTransform(pts,M)
-        x,y,w,h = cv2.boundingRect(dst)
-        cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
-
-        pose = self.marker.getPose( x, y, w, h)
-        self.marker.publishMarker(pose)
+        squares = find_squares(img)
+        cv2.drawContours( img, squares, 0, (120,0,120), 3 )
+        #publish pose in rviz
+        if squares:
+          xx,yy,ww,hh = get_side(squares)
+          pose = self.estimate_depth(xx, yy, ww, hh)
+          self.marker.publishMarker(pose)
 
         cv2.putText(img, face_names[template_path], (50, 150),cv2.FONT_HERSHEY_COMPLEX,1,(0,0,255),2)
 
@@ -133,6 +147,18 @@ class image_converter:
 
     return img
 
+
+  def estimate_depth(self,x,y,w,h):
+    center = np.array([256-(2*x + w)/2, 512-(2*y + h)/2])
+
+    self.laser_scan_index = 450 - center[0]/2
+    angle_diff = math.atan(float(center[0]) / 256 * math.tan(22.5 * math.pi / 180))
+
+    x = self.laser_data * math.sin(angle_diff)
+    y = -self.laser_data * math.cos(angle_diff)
+    print("3d loc", x,y)
+    pose = self.marker.getPose(x,y)
+    return pose 
 
 
 

@@ -58,34 +58,44 @@ class RvizMarker():
 		self.pub_rviz_marker.publish(self.sphere_marker)
 
 		
-	def getPose(self, x, y, w, h):
-		center = np.array([(2*x + w)/2, (2*y + h)/2])
-
-		focal_length = 0.5*512/(math.tan(math.pi/8))
-		u0 = 512./2.
-		v0 = 512./2.
-
-
-
+	def getPose(self, x, y):
 		pose = Pose()
-		pose.position.x = 256/(w * math.tan(math.pi/8))#(center[0]-u0) / focal_length
-		pose.position.y = 256/(h * math.tan(math.pi/8)) #(center[1]-v0) / focal_length
+		pose.position.x = x
+		pose.position.y = y
 		pose.position.z = 0
-		im_pix_h = h / 2
-		im_theta = ((math.pi / 8) * h) / (512)
-		dist_pix = (im_pix_h) / math.tan(im_theta)
-		dist_x_real = ((dist_pix * 0.5) / im_pix_h)
-		pose.position.x = dist_x_real
-		pose.position.y = ((x + w / 2) / 512)
-		pose.position.z = 0
-
-		#pose.position.x  = dist_x_real
-		#pose.position.y = ((x + w / 2) / 512)
-		#pose.position.z = 0
-
-
 		pose.orientation.x = 0.0
 		pose.orientation.y = 0.0
 		pose.orientation.z = 0.0
 		pose.orientation.w = 1.0
 		return pose
+	# def getPose(self, x, y, w, h):
+	# 	center = np.array([(2*x + w)/2, (2*y + h)/2])
+
+	# 	focal_length = 0.5*512/(math.tan(math.pi/8))
+	# 	u0 = 512./2.
+	# 	v0 = 512./2.
+
+
+
+	# 	pose = Pose()
+	# 	pose.position.x = 256/(h * math.tan(math.pi/8))#(center[0]-u0) / focal_length
+	# 	#pose.position.y = 128/(w * math.tan(math.pi/8)) #(center[1]-v0) / focal_length
+	# 	pose.position.z = 0
+	# 	im_pix_h = h / 2
+	# 	im_theta = ((math.pi / 8) * h) / (512)
+	# 	dist_pix = (im_pix_h) / math.tan(im_theta)
+	# 	dist_x_real = ((dist_pix * 0.5) / im_pix_h)
+	# 	#pose.position.x = dist_x_real
+	# 	pose.position.y = ((x + w / 2) / 512)
+	# 	pose.position.z = 0
+
+	# 	#pose.position.x  = dist_x_real
+	# 	#pose.position.y = ((x + w / 2) / 512)
+	# 	#pose.position.z = 0
+
+
+	# 	pose.orientation.x = 0.0
+	# 	pose.orientation.y = 0.0
+	# 	pose.orientation.z = 0.0
+	# 	pose.orientation.w = 1.0
+	# 	return pose

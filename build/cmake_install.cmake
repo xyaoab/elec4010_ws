@@ -117,6 +117,7 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/xinjie/elec4010_ws/build/gtest/cmake_install.cmake")
+  include("/home/xinjie/elec4010_ws/build/balll_tracker/cmake_install.cmake")
   include("/home/xinjie/elec4010_ws/build/image_rec/cmake_install.cmake")
   include("/home/xinjie/elec4010_ws/build/vrep_ros_interface/cmake_install.cmake")
 
