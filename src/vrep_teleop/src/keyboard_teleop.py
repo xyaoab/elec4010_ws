@@ -132,11 +132,11 @@ if __name__=="__main__":
             elif key == 't':
                 tracker_switch.data = (not tracker_switch.data)
                 tracker_switch_pub.publish(tracker_switch)
-                print("Tracker state changed")
+                print("Tracker state changed to :", tracker_switch.data)
             elif key == 'f':
                 cv_switch.data = (not cv_switch.data)
-                cv_switch_sub.publish(cv_switch)
-                print("Face recognition mode changed")
+                cv_switch_pub.publish(cv_switch)
+                print("Face recognition mode changed to: ",cv_switch.data)
             else:
                 count = count + 1
                 if count > 4:
