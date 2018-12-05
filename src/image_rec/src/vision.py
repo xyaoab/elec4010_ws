@@ -24,6 +24,7 @@ face_names = {
   templates_path+templates[4] : "levi"
 }
 cv_flag = True
+cv_window_flag = False
 
 class image_converter:
 
@@ -48,6 +49,7 @@ class image_converter:
 
   def callback(self,data):
       global cv_flag
+      global cv_window_flag
       if cv_flag == True:
 
           try:
@@ -64,6 +66,7 @@ class image_converter:
           face = self.face_detect(cv_image)
 
           cv2.imshow("Image window", face)
+          cv_window_flag = True
           cv2.waitKey(1)
 
           try:
@@ -71,6 +74,9 @@ class image_converter:
           except CvBridgeError as e:
               print(e)
       else:
+          if cv_window_flag == True:
+              cv2.destroyAllWindows()
+              cv_window_flag = False
           print("Face recognition turned off !!")
   # human face
   def face_detect(self,img):
