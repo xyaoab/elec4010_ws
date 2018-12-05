@@ -1,0 +1,13 @@
+\contentsline {section}{\numberline {1}Project Overview}{2}
+\contentsline {section}{\numberline {2}Tasks Finished}{2}
+\contentsline {section}{\numberline {3}Detailed explaination for each task}{2}
+\contentsline {subsection}{\numberline {3.1}Task 1}{2}
+\contentsline {subsection}{\numberline {3.2}Task 2}{2}
+\contentsline {subsection}{\numberline {3.3}Task 3}{2}
+\contentsline {subsection}{\numberline {3.4}Task 4}{2}
+\contentsline {subsection}{\numberline {3.5}Task 5}{2}
+\contentsline {section}{\numberline {4}User Guide}{2}
+\contentsline {subsection}{\numberline {4.1}Installing Dependencies}{2}
+\contentsline {subsection}{\numberline {4.2}Running the program}{2}
+\contentsline {subsection}{\numberline {4.3}Keyboard Operations}{2}
+\contentsline {section}{\numberline {5}Remarks}{2}
