@@ -55,7 +55,7 @@ class image_converter:
               cv_image = cv2.flip(cv_image,1)
 
           except CvBridgeError as e:
-          print(e)
+            print(e)
           ##### detect face
           ## init rviz marker node
           self.marker = RvizMarker('base_link', '/rviz/marker')

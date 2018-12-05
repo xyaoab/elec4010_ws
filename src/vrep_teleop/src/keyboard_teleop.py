@@ -30,7 +30,7 @@
 import rospy
 
 from geometry_msgs.msg import Twist
-from std_msgs import Bool
+from std_msgs.msg import Bool
 
 import sys, select, termios, tty
 
@@ -130,11 +130,11 @@ if __name__=="__main__":
                 control_speed = 0
                 control_turn = 0
             elif key == 't':
-                tracker_switch.data = !tracker_switch.data
+                tracker_switch.data = (not tracker_switch.data)
                 tracker_switch_pub.publish(tracker_switch)
                 print("Tracker state changed")
             elif key == 'f':
-                cv_switch.data = !cv_switch.data
+                cv_switch.data = (not cv_switch.data)
                 cv_switch_sub.publish(cv_switch)
                 print("Face recognition mode changed")
             else:
