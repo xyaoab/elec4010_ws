@@ -1,8 +1,0 @@
-prefix=/home/xinjie/elec4010_ws/devel
-
-Name: image_rec
-Description: Description of image_rec
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/xinjie/elec4010_ws/devel/lib 
-Requires: 

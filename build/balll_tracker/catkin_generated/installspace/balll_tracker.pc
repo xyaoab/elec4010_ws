@@ -1,8 +1,0 @@
-prefix=/home/xinjie/elec4010_ws/install
-
-Name: balll_tracker
-Description: Description of balll_tracker
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/xinjie/elec4010_ws/install/lib 
-Requires: 
