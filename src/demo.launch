@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 	<node pkg="vrep_teleop" name="keyboard_teleop" type="keyboard_teleop.py" output="screen"/>
+	<node pkg="auto_exp" name="auto_exp" type="auto_exp.py" output="screen"/>
 
 
   	<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.0 0.0 0.0 0 0 0.0 odom base_link 100" />
