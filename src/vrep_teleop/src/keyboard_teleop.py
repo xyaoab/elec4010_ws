@@ -35,7 +35,7 @@ from std_msgs.msg import Bool
 import sys, select, termios, tty
 
 msg = """
-Control Your Turtlebot!
+Control Your Robot!
 ---------------------------
 Moving around:
    u    i    o
@@ -45,6 +45,9 @@ q/z : increase/decrease max speeds by 10%
 w/x : increase/decrease only linear speed by 10%
 e/c : increase/decrease only angular speed by 10%
 space key, k : force stop
+t : turn on/off the ball tracker
+f : turn on/off face recognition
+g : turn on/off automatic exploration
 anything else : stop smoothly
 CTRL-C to quit
 """
@@ -93,10 +96,14 @@ if __name__=="__main__":
     vel_pub = rospy.Publisher('vrep/cmd_vel', Twist, queue_size=5)
     cv_switch_pub = rospy.Publisher('/cv_switch/bool', Bool, queue_size=5)
     tracker_switch_pub = rospy.Publisher('/tracker_switch/bool', Bool, queue_size=5)
+    exp_switch_pub = rospy.Publisher('/exp_switch/bool', Bool, queue_size=5)
     cv_switch = Bool()
     cv_switch.data = True
     tracker_switch = Bool()
     tracker_switch.data = False
+    exp_switch = Bool()
+    exp_switch.data = False
+
     x = 0
     th = 0
     status = 0
@@ -137,6 +144,10 @@ if __name__=="__main__":
                 cv_switch.data = (not cv_switch.data)
                 cv_switch_pub.publish(cv_switch)
                 print("Face recognition mode changed to: ",cv_switch.data)
+            elif key == 'g':
+                exp_switch.data = (not exp_switch.data)
+                exp_switch_pub.publish(exp_switch)
+                print("Automatic exploration mode changed to: ",exp_switch.data)
             else:
                 count = count + 1
                 if count > 4:
@@ -165,7 +176,7 @@ if __name__=="__main__":
             twist = Twist()
             twist.linear.x = control_speed; twist.linear.y = 0; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = control_turn
-            if tracker_switch.data == False:    
+            if tracker_switch.data == False and exp_switch.data == False:    
                 vel_pub.publish(twist)
 
             #print("loop: {0}".format(count))
